@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.min.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <title>Chess</title>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <ul class="coordinates vertical">
+        <li class="coordinate">1</li>
+        <li class="coordinate">2</li>
+        <li class="coordinate">3</li>
+        <li class="coordinate">4</li>
+        <li class="coordinate">5</li>
+        <li class="coordinate">6</li>
+        <li class="coordinate">7</li>
+        <li class="coordinate">8</li>
+      </ul>
+      <ul class="coordinates horizontal">
+        <li class="coordinate">a</li>
+        <li class="coordinate">b</li>
+        <li class="coordinate">c</li>
+        <li class="coordinate">d</li>
+        <li class="coordinate">e</li>
+        <li class="coordinate">f</li>
+        <li class="coordinate">g</li>
+        <li class="coordinate">h</li>
+      </ul>
+      <div class="board" id="board">
+        <!-- 8th line -->
+        <div class="square white">
+          <div class="piece rook" color="black">
+            <img src="figures/rook-black.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece knight" color="black">
+            <img src="figures/knight-black.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece bishop" color="black">
+            <img src="figures/bishop-black.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece queen" color="black">
+            <img src="figures/queen-black.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece king" color="black">
+            <img src="figures/king-black.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece bishop" color="black">
+            <img src="figures/bishop-black.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece knight" color="black">
+            <img src="figures/knight-black.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece rook" color="black">
+            <img src="figures/rook-black.png" alt="">
+          </div>
+        </div>
+        <!-- 7th line -->
+        <div class="square black">
+          <div class="piece pawn" color="black">
+            <img src="figures/pawn-black.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece pawn" color="black">
+            <img src="figures/pawn-black.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece pawn" color="black">
+            <img src="figures/pawn-black.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece pawn" color="black">
+            <img src="figures/pawn-black.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece pawn" color="black">
+            <img src="figures/pawn-black.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece pawn" color="black">
+            <img src="figures/pawn-black.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece pawn" color="black">
+            <img src="figures/pawn-black.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece pawn" color="black">
+            <img src="figures/pawn-black.png" alt="">
+          </div>
+        </div>
+        <!-- 6th line -->
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <!-- 5th line -->
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <!-- 4th line -->
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <!-- 3th line -->
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <div class="square black"></div>
+        <div class="square white"></div>
+        <!-- 2th line -->
+        <div class="square white">
+          <div class="piece pawn" color="white">
+            <img src="figures/pawn-white.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece pawn" color="white">
+            <img src="figures/pawn-white.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece pawn" color="white">
+            <img src="figures/pawn-white.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece pawn" color="white">
+            <img src="figures/pawn-white.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece pawn" color="white">
+            <img src="figures/pawn-white.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece pawn" color="white">
+            <img src="figures/pawn-white.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece pawn" color="white">
+            <img src="figures/pawn-white.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece pawn" color="white">
+            <img src="figures/pawn-white.png" alt="">
+          </div>
+        </div>
+        <!-- 1th line -->
+        <div class="square black">
+          <div class="piece rook" color="white">
+            <img src="figures/rook-white.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece knight" color="white">
+            <img src="figures/knight-white.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece bishop" color="white">
+            <img src="figures/bishop-white.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece queen" color="white">
+            <img src="figures/queen-white.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece king" color="white">
+            <img src="figures/king-white.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece bishop" color="white">
+            <img src="figures/bishop-white.png" alt="">
+          </div>
+        </div>
+        <div class="square black">
+          <div class="piece knight" color="white">
+            <img src="figures/knight-white.png" alt="">
+          </div>
+        </div>
+        <div class="square white">
+          <div class="piece rook" color="white">
+            <img src="figures/rook-white.png" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="js/main.js"></script>
+</html>

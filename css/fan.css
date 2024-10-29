@@ -1,0 +1,40 @@
+:root {
+  --white-color-lichess: #f0d9b5;
+  --white-color-chesscom: #edd6b0;
+  --black-color-lichess: #b58863;
+  --black-color-chesscom: #b88762;
+  --container-color: #161512;
+  --background-color: #33312e;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100vh;
+  margin: 0;
+}
+
+.wrapper {
+  min-width: 100%;
+  min-height: 100%;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  width: 50vw;
+  height: 50vw;
+  background: var(--);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.board {
+  width: 90%;
+  height: 90%;
+  background: ;
+}

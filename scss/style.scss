@@ -1,0 +1,135 @@
+$white-color-lichess: #f0d9b5;
+$white-color-chesscom: #edd6b0;
+$black-color-lichess: #b58863;
+$black-color-chesscom: #b88762;
+$container-color: #161512;
+$background-color: #33312e;
+$board-size: 100%;
+
+body {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100vh;
+  margin: 0;
+}
+
+.wrapper {
+  min-width: 100%;
+  min-height: 100%;
+  background: $background-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.container {
+  width: 50vw;
+  height: 50vw;
+  background: $container-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.coordinates {
+  color: #bababa;
+  display: flex;
+  font-size: 2rem;
+  user-select: none;
+  
+  @media (max-width: 1200px) {
+    font-size: 1.5rem;
+  }
+  
+  @media (max-width: 900px) {
+    font-size: 1rem;
+  }
+}
+
+.vertical {
+  color: #6f6f6f;
+  flex-direction: column-reverse;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: -4%;
+  height: $board-size;
+  justify-content: space-around;
+  align-items: flex-start;
+}
+
+.horizontal {
+  color: #6f6f6f;
+  flex-direction: row;
+  position: absolute;
+  bottom: 0;
+  left: 5%;
+  margin-left: -9%;
+  width: $board-size;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+
+.board {
+  width: $board-size;
+  height: $board-size;
+  display: grid;
+  grid-template: repeat(8, 12.5%) / repeat(8, 12.5%);
+}
+
+.square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.piece {
+  width: 100%;
+  z-index: 1;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  img {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.white {
+  background: $white-color-lichess;
+}
+
+.black {
+  background: $black-color-chesscom;
+}
+
+// .pawn {
+//   background: ;
+// }
+
+// .rook {
+//   background: ;
+// }
+
+// .knight {
+//   background: ;
+// }
+
+// .bishop {
+//   background: ;
+// }
+
+// .queen {
+//   background: ;
+// }
+
+// .king {
+//   background: ;
+// }
+

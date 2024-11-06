@@ -4,6 +4,7 @@
   let moves = [];
   const castlingSquares = ["g1", "g8", "c1", "c8"];
   let isWhiteTurn = true;
+  let enPassantSquare = "blank";
   const squares = document.getElementsByClassName('square');
   const pieces = document.getElementsByClassName('piece');
   let piecesImages = document.getElementsByTagName('img');
@@ -139,6 +140,34 @@
     return;
   }
 
+  function performEnPassant(piece, pieceColor, startingSquareId, destinationSquareId) {
+    console.log('performance');
+    let file = destinationSquareId[0];
+    let rank = parseInt(destinationSquareId[1]);
+    rank += (pieceColor === "white") ? -1 : 1;
+    let squareBehindId = file + rank;
+    const squareBehindElement = document.getElementById(squareBehindId);
+    console.log(squareBehindElement);
+    while (squareBehindElement.firstChild) {
+      squareBehindElement.removeChild(squareBehindElement.firstChild);
+      let squareBehind = boardSquaresArray.find(
+        (element) => element.squareId === squareBehindId
+      );
+      squareBehind.pieceColor = "blank";
+      squareBehind.pieceType = "blank";
+      squareBehind.pieceId = "blank";
+
+      const destinationSquare = document.getElementById(destinationSquareId);
+      destinationSquare.appendChild(piece);
+      isWhiteTurn = !isWhiteTurn;
+      updateBoardSquaresArray(startingSquareId, destinationSquareId, boardSquaresArray);
+      let captured = true;
+      makeMove(startingSquareId, destinationSquareId, "pawn", pieceColor, captured);
+      checkForCheckMate();
+      return;
+    }
+  }
+
   function setupPieces() {
     for (let i = 0; i < pieces.length; i++) {
       pieces[i].addEventListener("click", drag);
@@ -210,6 +239,15 @@
         return;
       }
       if (pieceType == "king" && !kingHasMoved(pieceColor) && castlingSquares.includes(destinationSquareId) && isCheck) return; // Рокироваться под шахом нельзя
+
+      console.log(enPassantSquare);
+      if (pieceType == "pawn" && enPassantSquare == destinationSquareId) {
+        console.log('enPassant drop');
+        performEnPassant(piece, pieceColor, startingSquareId, destinationSquareId);
+        enPassantSquare = "blank";
+        return;
+      }
+
 
       destinationSquare.appendChild(piece);
       isWhiteTurn = !isWhiteTurn;
@@ -290,6 +328,18 @@
     return legalSquares;
   }
 
+  function enPassantPossible(currentSquareId, pawnStartingSquareId, direction) {
+    if (moves.length == 0) return false;
+    let lastMove = moves[moves.length-1];
+    if (!(lastMove.to === currentSquareId && lastMove.from === pawnStartingSquareId && lastMove.pieceType == "pawn")) return false;
+    file = currentSquareId[0];
+    rank = parseInt(currentSquareId[1]);
+    rank += direction;
+    let squareBehindId = file + rank;
+    enPassantSquare = squareBehindId;
+    return true;
+  }
+
   function checkPawnDiagonalCaptures(startingSquareId, pieceColor, boardSquaresArray) {
     const file = startingSquareId.charAt(0);
     const rank = startingSquareId.charAt(1);
@@ -310,6 +360,17 @@
         const squareContent = currentSquare.pieceColor;
         if (squareContent != "blank" && squareContent != pieceColor)
           legalSquares.push(currentSquareId);
+          if (squareContent == "blank") {
+            currentSquareId = currentFile + rank;
+            let pawnStartingSquareRank = rankNumber + direction * 2;
+            let pawnStartingSquareId = currentFile + pawnStartingSquareRank;
+
+            if (enPassantPossible(currentSquareId, pawnStartingSquareId, direction)) {
+              let pawnStartingSquareRank = rankNumber + direction;
+              let enPassantSquare = currentFile + pawnStartingSquareRank;
+              legalSquares.push(enPassantSquare);
+            }
+          }
       }
     }
     return legalSquares;

@@ -1,11 +1,9 @@
-
 (function () {
 
   let boardSquaresArray = [];
+  let moves = [];
+  const castlingSquares = ["g1", "g8", "c1", "c8"];
   let isWhiteTurn = true;
-  let whiteKingSquare = "e1";
-  let blackKingSquare = "e8";
-
   const squares = document.getElementsByClassName('square');
   const pieces = document.getElementsByClassName('piece');
   let piecesImages = document.getElementsByTagName('img');
@@ -13,6 +11,19 @@
   setupBoardSquares();
   setupPieces();
   fillBoardSquaresArray();
+
+  function makeMove(startingSquareId, destinationSquareId, pieceType, pieceColor, captured) {
+    if (pieceType === "rook") {
+      console.log('rook');
+    }
+    moves.push({
+      from: startingSquareId,
+      to: destinationSquareId,
+      pieceType: pieceType,
+      pieceColor: pieceColor,
+      captured: captured
+    })
+  }
 
   function deepCopyArray(array) {
     let arrayCopy = array.map(element => {
@@ -83,6 +94,51 @@
     }
   }
 
+  function performCastling(piece, pieceColor, startingSquareId, destinationSquareId, boardSquaresArray) {
+    let rookId, rookDestinationSquareId, checkSquareId;
+    if (destinationSquareId == "g1") {
+      rookId = "rookh1";
+      rookDestinationSquareId = "f1";
+      checkSquareId = "f1";
+    }
+    else if (destinationSquareId == "c1") {
+      rookId = "rooka1";
+      rookDestinationSquareId = "d1";
+      checkSquareId = "d1";
+    }
+    else if (destinationSquareId == "g8") {
+      rookId = "rookh8";
+      rookDestinationSquareId = "f8";
+      checkSquareId = "f8";
+    }
+    else if (destinationSquareId == "c8") {
+      rookId = "rooka8";
+      rookDestinationSquareId = "d8";
+      checkSquareId = "d8";
+    }
+    if (isKingInCheck(checkSquareId, pieceColor, boardSquaresArray)) return;
+    let rook = document.getElementById(rookId);
+    let rookDestinationSquare = document.getElementById(rookDestinationSquareId);
+    rookDestinationSquare.appendChild(rook);
+    updateBoardSquaresArray(
+      rook.id.slice(-2),
+      rookDestinationSquare.id,
+      boardSquaresArray
+    );
+    const destinationSquare = document.getElementById(destinationSquareId);
+    destinationSquare.appendChild(piece);
+    isWhiteTurn = !isWhiteTurn;
+    updateBoardSquaresArray(
+      startingSquareId,
+      destinationSquareId,
+      boardSquaresArray
+    );
+    let captured = false;
+    makeMove(startingSquareId, destinationSquareId, "king", pieceColor, captured);
+    checkForCheckMate();
+    return;
+  }
+
   function setupPieces() {
     for (let i = 0; i < pieces.length; i++) {
       pieces[i].addEventListener("click", drag);
@@ -115,10 +171,6 @@
       let legalSquares = getPossibleMoves(startingSquareId, pieceObject, boardSquaresArray);
       let legalSquaresJson = JSON.stringify(legalSquares);
       ev.dataTransfer.setData("application/json", legalSquaresJson);
-
-      if (pieceType == "king") {
-        console.log(legalSquares);  
-      }
     }
   }
 
@@ -133,34 +185,56 @@
     const piece = document.getElementById(pieceId);
     const pieceColor = piece.getAttribute("color");
     const pieceType = piece.classList[1];
+
     const destinationSquare = ev.currentTarget;
     let destinationSquareId = destinationSquare.id;
+
     legalSquares = isMoveValidAgainstCheck(legalSquares, startingSquareId, pieceColor, pieceType);
 
     if (pieceType == "king") {
-      let isCheck = isKingInCheck(destinationSquareId, pieceColor, boardSquaresArray);
-      console.log("king's destination:", destinationSquareId); // так как при отпускании короля на запретном поле ф-ция isKingCheck дает true, в return ничего не идет и drop не срабатывает
-      console.log(legalSquares);
+      let isCheck = isKingInCheck(destinationSquareId, pieceColor, boardSquaresArray); // так как при отпускании короля на запретном поле ф-ция isKingCheck дает true, в return ничего не идет и drop не срабатывает
       if (isCheck) return;
-      isWhiteTurn ? (whiteKingSquare = destinationSquareId) : (blackKingSquare = destinationSquareId);
     }
 
     let squareContent = getPieceAtSquare(destinationSquareId, boardSquaresArray);
 
-    if ((squareContent.pieceColor == "blank") && (legalSquares.includes(destinationSquareId))) {
+    if ((squareContent.pieceColor == "blank") && (legalSquares.includes(destinationSquareId))) { // ход на пустое поле
+      let isCheck = false;
+      if (pieceType == "king") {
+        isCheck = isKingInCheck(startingSquareId, pieceColor, boardSquaresArray);
+      }
+
+
+      if (pieceType == "king" && !kingHasMoved(pieceColor) && castlingSquares.includes(destinationSquareId) && !isCheck) {
+        performCastling(piece, pieceColor, startingSquareId, destinationSquareId, boardSquaresArray);
+        return;
+      }
+      if (pieceType == "king" && !kingHasMoved(pieceColor) && castlingSquares.includes(destinationSquareId) && isCheck) return; // Рокироваться под шахом нельзя
+
       destinationSquare.appendChild(piece);
       isWhiteTurn = !isWhiteTurn;
       updateBoardSquaresArray(startingSquareId, destinationSquareId, boardSquaresArray);
+
+      let captured = false;
+      makeMove(startingSquareId, destinationSquareId, pieceType, pieceColor, captured);
+
       checkForCheckMate();
       return;
     }
-    if ((squareContent.pieceColor != "blank") && (legalSquares.includes(destinationSquareId))) {
+
+
+
+    if ((squareContent.pieceColor != "blank") && (legalSquares.includes(destinationSquareId))) { // Взятие фигуры
       while (destinationSquare.firstChild) {
         destinationSquare.removeChild(destinationSquare.firstChild);
       }
       destinationSquare.appendChild(piece);
       isWhiteTurn = !isWhiteTurn;
       updateBoardSquaresArray(startingSquareId, destinationSquareId, boardSquaresArray);
+
+      let captured = true;
+      makeMove(startingSquareId, destinationSquareId, pieceType, pieceColor, captured);
+
       checkForCheckMate();
       return;
     }
@@ -552,7 +626,51 @@
         legalSquares.push(String.fromCharCode(currentFile + 97) + currentRank);
       }
     });
+
+    let shortCastleSquare = isShortCastlePossible(pieceColor, boardSquaresArray);
+    let longCastleSquare = isLongCastlePossible(pieceColor, boardSquaresArray);
+    if (shortCastleSquare !== "blank") legalSquares.push(shortCastleSquare);
+    if (longCastleSquare !== "blank") legalSquares.push(longCastleSquare);
+
     return legalSquares;
+  }
+
+  // CASTLING
+
+  function isShortCastlePossible(pieceColor, boardSquaresArray) {
+    let rank = pieceColor === "white" ? "1" : "8";
+    let fSquare = boardSquaresArray.find(element => element.squareId === `f${rank}`);
+    let gSquare = boardSquaresArray.find(element => element.squareId === `g${rank}`);
+
+    if (fSquare.pieceColor !== "blank" || gSquare.pieceColor !== "blank" || kingHasMoved(pieceColor) || rookHasMoved(pieceColor, `h${rank}`)) {
+      console.log("Рокировки не будет")
+      console.log(fSquare, gSquare, kingHasMoved(pieceColor), rookHasMoved(pieceColor, `h${rank}`));
+      return "blank";
+    }
+    return `g${rank}`;
+  }
+
+  function isLongCastlePossible(pieceColor, boardSquaresArray) {
+    let rank = pieceColor === "white" ? "1" : "8";
+    let dSquare = boardSquaresArray.find(element => element.squareId === `d${rank}`);
+    let cSquare = boardSquaresArray.find(element => element.squareId === `c${rank}`);
+    let bSquare = boardSquaresArray.find(element => element.squareId === `b${rank}`);
+    if (dSquare.pieceColor !== "blank" || cSquare.pieceColor !== "blank" || bSquare.pieceColor !== "blank" || kingHasMoved(pieceColor) || rookHasMoved(pieceColor, `a${rank}`)) {
+      return "blank";
+    }
+    return `c${rank}`;
+  }
+
+  function kingHasMoved(pieceColor) {
+    let result = moves.find((element) => (element.pieceColor === pieceColor) && (element.pieceType === "king"));
+    if (result !== undefined) return true;
+    return false;
+  }
+
+  function rookHasMoved(pieceColor, startingSquareId) { // didn'T WORK
+    let result = moves.find((element) => (element.pieceColor === pieceColor) && (element.pieceType === "rook") && (element.from == startingSquareId)); // piecetype - pieceType
+    if (result !== undefined) return true;
+    return false;
   }
 
   // CHECK AND MATE
@@ -603,6 +721,14 @@
     return false;
   }
 
+  function getKingLastMove(color) {
+    let kingLastMove = moves.find(element => element.pieceType === "king" && element.pieceColor === color);
+    if (kingLastMove == undefined) {
+      return isWhiteTurn ? "e1" : "e8";
+    }
+    return kingLastMove.to;
+  }
+
 
   // function getAllPossibleMoves(squaresArray, color) { // находит абсолютно все возможные ходы фигур за одну сторону
   //   return squaresArray
@@ -638,16 +764,16 @@
   // }
 
   function checkForCheckMate() {
-    let kingSqaure=isWhiteTurn  ? whiteKingSquare: blackKingSquare;
-    let pieceColor=isWhiteTurn  ? "white": "black";
+    let kingSqaure = isWhiteTurn ? getKingLastMove("white") : getKingLastMove("black");
+    let pieceColor = isWhiteTurn ? "white" : "black";
     let boardSquaresArrayCopy = deepCopyArray(boardSquaresArray);
-    let kingIsCheck=isKingInCheck(kingSqaure,pieceColor,boardSquaresArrayCopy);
-    
-    if(!kingIsCheck) return;
-    let possibleMoves=getAllPossibleMoves(boardSquaresArrayCopy,pieceColor);
-    if(possibleMoves.length>0) return;
-    let message="";
-    isWhiteTurn  ? (message="Black Wins") : (message="White Wins");
+    let kingIsCheck = isKingInCheck(kingSqaure, pieceColor, boardSquaresArrayCopy);
+
+    if (!kingIsCheck) return;
+    let possibleMoves = getAllPossibleMoves(boardSquaresArrayCopy, pieceColor);
+    if (possibleMoves.length > 0) return;
+    let message = "";
+    isWhiteTurn ? (message = "Black Wins") : (message = "White Wins");
     showAlert(message);
   }
 
@@ -672,13 +798,13 @@
     return squaresArray
       .filter((square) => square.pieceColor === color)
       .flatMap((square) => {
-        const { pieceColor,pieceType,pieceId } = getPieceAtSquare(square.squareId,squaresArray);
+        const { pieceColor, pieceType, pieceId } = getPieceAtSquare(square.squareId, squaresArray);
         if (pieceId === "blank") return [];
-  
+
         //const piece = document.getElementById(pieceId);
         let squaresArrayCopy = deepCopyArray(squaresArray);
-        const pieceObject ={pieceColor:pieceColor,pieceType:pieceType,pieceId:pieceId}
-  
+        const pieceObject = { pieceColor: pieceColor, pieceType: pieceType, pieceId: pieceId }
+
         let legalSquares = getPossibleMoves(
           square.squareId,
           pieceObject,
@@ -690,15 +816,15 @@
           pieceColor,
           pieceType
         );
-  
+
         return legalSquares;
       });
   }
 
-  function isMoveValidAgainstCheck(legalSquares,startingSquareId,pieceColor,pieceType){
-    let kingSquare = isWhiteTurn  ? whiteKingSquare : blackKingSquare;
+  function isMoveValidAgainstCheck(legalSquares, startingSquareId, pieceColor, pieceType) {
+    let kingSquare = isWhiteTurn ? getKingLastMove("white") : getKingLastMove("black");
     let boardSquaresArrayCopy = deepCopyArray(boardSquaresArray);
-    legalSquaresCopy =legalSquares.slice();
+    let legalSquaresCopy = legalSquares.slice();
     legalSquaresCopy.forEach((element) => {
       let destinationId = element;
       //boardSquaresArrayCopy.length=0;
@@ -708,18 +834,62 @@
         destinationId,
         boardSquaresArrayCopy
       );
-      
+
       if (pieceType != "king" && isKingInCheck(kingSquare, pieceColor, boardSquaresArrayCopy)) {
         legalSquares = legalSquares.filter((item) => item !== destinationId);
       }
-      
+
       if (pieceType == "king" && isKingInCheck(destinationId, pieceColor, boardSquaresArrayCopy)) {
         legalSquares = legalSquares.filter((item) => item !== destinationId);
       }
-  
+
     });
     return legalSquares;
   }
+
+  // Программа Нурэлеса работать перестала;
+
+  // А в инете решения она сыскала, 
+
+  // Что это баг еще не так большой руки:
+
+  // Лишь стоит спросить у GPT,
+
+  // Ответов с полдюжины себе Нурэлес достал;
+
+  // Вертит решениями так и сяк:
+
+  // То в функцию их вставит, то от руки все перепишет,
+
+  // То их понюхает, то их полижет;
+
+  // Код всё не действуют никак.
+
+  // "Тьфу пропасть! - скрежет он зубами, - и тот дурак,
+
+  // Кто слушает нейронок всех врак:
+
+  // Всё про решения лишь мне налгали;
+
+  // А проку на волос нет в них".
+
+  // Мартышка тут с досады и с печали
+
+  // О камень так хватила их,
+
+  // Что только брызги засверкали.
+
+
+
+  // К несчастью, то ж бывает у людей:
+
+  // Как ни полезна вещь, - иены не зная ей,
+
+  // Невежда про нее свой толк все к худу клонит;
+
+  // А ежели невежда познатней,
+
+  // Так он ее еще и гонит.
 
 
 

@@ -956,7 +956,8 @@
       let pieceProperties = getPieceAtSquare(squareId, boardSquaresArray);
       if (
         (pieceProperties.pieceType == "rook" ||
-          pieceProperties.pieceType == "queen") &&
+          pieceProperties.pieceType == "queen" ||
+          pieceProperties.pieceType == "amazon") &&
         pieceColor != pieceProperties.pieceColor
       ) return true;
     }
@@ -965,7 +966,8 @@
       let pieceProperties = getPieceAtSquare(squareId, boardSquaresArray);
       if (
         (pieceProperties.pieceType == "bishop" ||
-          pieceProperties.pieceType == "queen") &&
+          pieceProperties.pieceType == "queen" ||
+          pieceProperties.pieceType == "amazon") &&
         pieceColor != pieceProperties.pieceColor
       ) return true;
     }
@@ -981,7 +983,8 @@
     for (let squareId of legalSquares) {
       let pieceProperties = getPieceAtSquare(squareId, boardSquaresArray);
       if (
-        (pieceProperties.pieceType == "knight") &&
+        (pieceProperties.pieceType == "knight" ||
+          pieceProperties.pieceType == "amazon") &&
         pieceColor != pieceProperties.pieceColor
       ) return true;
     }
@@ -1111,6 +1114,7 @@
       }
 
     });
+    console.log(legalSquares);
     return legalSquares;
   }
 
